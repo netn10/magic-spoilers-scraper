@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <script src="https://randojs.com/2.0.0.js"></script>
+    </head>
+    <body>
+        <div id="main">
+            <img src="https://picsum.photos/200/300">
+        </div>
+    </body>
+    <script>
+        all_random_pictures = randoSequence(0, 100)
+
+        console.log(all_random_pictures)
+
+        id = -1
+        function load_images() {
+            id += 1;
+            var elem = document.createElement("img");
+            elem.setAttribute("src", `https://picsum.photos/id/${all_random_pictures[id]}/200/300`);
+            elem.setAttribute("id", id);
+
+            document.getElementById("main").appendChild(elem);
+            setTimeout(load_images, 5000);
+        }
+        
+        load_images();
+    </script>
+</html>
