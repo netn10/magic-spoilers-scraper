@@ -56,7 +56,7 @@ def scrape_reddit(is_first_scrap: bool, reddit_client_id: str, reddit_client_sec
             current_reddit_snapshot = last_post
             # Send it to Telegram
             print(f"Sending... {current_reddit_snapshot}")
-            #telegram_bot_sendtext(current_reddit_snapshot)
+            telegram_bot_sendtext(current_reddit_snapshot)
             return current_reddit_snapshot
 
 def scrape_mythic_spoilers(is_first_scrap: bool):
@@ -89,5 +89,5 @@ def scrape_mythic_spoilers(is_first_scrap: bool):
                 img_src = f"https://mythicspoiler.com/{img_src}"
                 # Send it to Telegram
                 print(f"sending... {img_src}")
-                #telegram_bot_sendtext(img_src)
+                telegram_bot_sendtext(img_src)
                 return current_mythic_spoiler_snapshot
