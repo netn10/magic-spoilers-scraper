@@ -31,10 +31,15 @@ current_reddit_snapshot = []
 current_mythic_spoiler_snapshot = []
 
 def telegram_bot_sendtext(telegram_bot_token: str, telegram_group_id: str, bot_message: str):
-    time.sleep(2)
-    send_text = f'https://api.telegram.org/bot{telegram_bot_token}/sendMessage?chat_id={telegram_group_id}&parse_mode=Markdown&text={bot_message}'
-    response = requests.get(send_text)
-    return response.json()
+    try:
+        time.sleep(2)
+        send_text = f'https://api.telegram.org/bot{telegram_bot_token}/sendMessage?chat_id={telegram_group_id}&text={bot_message}'
+        response = requests.get(send_text)
+        print(response.text)
+        return response.json()
+    except Exception as e:
+        print(e)
+        telegram_bot_sendtext(telegram_bot_token, telegram_group_id, bot_message)
 
 def scrape_reddit(is_first_scrap: bool, reddit_client_id: str, reddit_client_secret: str, reddit_user_agent: str):
     global current_reddit_snapshot
@@ -45,18 +50,19 @@ def scrape_reddit(is_first_scrap: bool, reddit_client_id: str, reddit_client_sec
     subreddit = reddit_read_only.subreddit("magicTCG")
 
     last_post = list(subreddit.new(limit=1))[0]
-    last_post = "https://www.reddit.com/" + last_post.permalink
+    link_flair_text = last_post.link_flair_text
+    last_post = "https://www.reddit.com" + last_post.permalink
     if is_first_scrap == True:
         current_reddit_snapshot = last_post
         return last_post
     else:
-        if last_post != current_reddit_snapshot:
+        if last_post != current_reddit_snapshot and link_flair_text == "Spoiler":
             # That's a new leak!
             # Add to the list of cards
             current_reddit_snapshot = last_post
             # Send it to Telegram
             print(f"Sending... {current_reddit_snapshot}")
-            telegram_bot_sendtext(current_reddit_snapshot)
+            telegram_bot_sendtext(TELEGRAM_BOT_TOKEN, TELEGRAM_GROUP_ID, current_reddit_snapshot)
             return current_reddit_snapshot
 
 def scrape_mythic_spoilers(is_first_scrap: bool):
@@ -89,5 +95,5 @@ def scrape_mythic_spoilers(is_first_scrap: bool):
                 img_src = f"https://mythicspoiler.com/{img_src}"
                 # Send it to Telegram
                 print(f"sending... {img_src}")
-                telegram_bot_sendtext(img_src)
+                telegram_bot_sendtext(TELEGRAM_BOT_TOKEN, TELEGRAM_GROUP_ID, img_src)
                 return current_mythic_spoiler_snapshot
